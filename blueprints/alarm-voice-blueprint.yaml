@@ -1,0 +1,117 @@
+blueprint:
+  name: "Alarm State Voice Announcement"
+  description: >
+    Announces alarm panel state changes through any TTS speaker.
+    Different messages for armed away, armed home, armed night, disarmed,
+    and triggered states.
+    
+    Free standalone automation from The Automated Home.
+    For 9 full automations (welcome home, person detection, garage, goodnight),
+    custom Jarvis voice, and distributed audio — check the full Jarvis Voice Pack
+    at beslain.gumroad.com/l/ha-jarvis-voice-pack/LAUNCH50
+  domain: automation
+  input:
+    alarm_entity:
+      name: "Alarm Panel"
+      selector:
+        entity:
+          domain: alarm_control_panel
+    media_player:
+      name: "Speaker"
+      selector:
+        entity:
+          domain: media_player
+    tts_service:
+      name: "TTS Service"
+      default: "tts.speak"
+      selector:
+        select:
+          options:
+            - "tts.speak"
+            - "tts.google_translate_say"
+            - "tts.cloud_say"
+            - "tts.piper"
+    msg_armed_away:
+      name: "Armed Away Message"
+      default: "System armed. All sensors active."
+      selector:
+        text:
+    msg_armed_home:
+      name: "Armed Home Message"
+      default: "System armed, home mode."
+      selector:
+        text:
+    msg_armed_night:
+      name: "Armed Night Message"
+      default: "Alarm armed. Goodnight."
+      selector:
+        text:
+    msg_disarmed:
+      name: "Disarmed Message"
+      default: "System disarmed."
+      selector:
+        text:
+    msg_triggered:
+      name: "Triggered Message"
+      default: "Warning. Alarm triggered."
+      selector:
+        text:
+
+mode: queued
+
+trigger:
+  - platform: state
+    entity_id: !input alarm_entity
+
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input alarm_entity
+            state: "armed_away"
+        sequence:
+          - service: !input tts_service
+            target:
+              entity_id: !input media_player
+            data:
+              message: !input msg_armed_away
+      - conditions:
+          - condition: state
+            entity_id: !input alarm_entity
+            state: "armed_home"
+        sequence:
+          - service: !input tts_service
+            target:
+              entity_id: !input media_player
+            data:
+              message: !input msg_armed_home
+      - conditions:
+          - condition: state
+            entity_id: !input alarm_entity
+            state: "armed_night"
+        sequence:
+          - service: !input tts_service
+            target:
+              entity_id: !input media_player
+            data:
+              message: !input msg_armed_night
+      - conditions:
+          - condition: state
+            entity_id: !input alarm_entity
+            state: "disarmed"
+        sequence:
+          - service: !input tts_service
+            target:
+              entity_id: !input media_player
+            data:
+              message: !input msg_disarmed
+      - conditions:
+          - condition: state
+            entity_id: !input alarm_entity
+            state: "triggered"
+        sequence:
+          - service: !input tts_service
+            target:
+              entity_id: !input media_player
+            data:
+              message: !input msg_triggered

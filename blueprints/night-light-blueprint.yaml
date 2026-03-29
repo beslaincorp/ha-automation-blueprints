@@ -1,0 +1,74 @@
+blueprint:
+  name: "Motion-Activated Night Light"
+  description: >
+    Turn on a light at low brightness when motion is detected, but only during
+    nighttime hours. Automatically turns off after a configurable timeout.
+    Won't trigger if the light is already on above 50%.
+    
+    Free standalone automation from The Automated Home.
+    For multi-zone coordination, color temperature curves, and 8 pre-built
+    room configs — check out the full Night Lights Pack at
+    beslain.gumroad.com/l/ha-night-lights-pack/LAUNCH50
+  domain: automation
+  input:
+    motion_sensor:
+      name: "Motion Sensor"
+      description: "Binary sensor that detects motion"
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    light_entity:
+      name: "Light"
+      description: "The light to control"
+      selector:
+        target:
+          entity:
+            domain: light
+    brightness_pct:
+      name: "Brightness"
+      description: "Night light brightness percentage"
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+    timeout_seconds:
+      name: "Timeout"
+      description: "Seconds before light turns off after last motion"
+      default: 120
+      selector:
+        number:
+          min: 10
+          max: 900
+          unit_of_measurement: "seconds"
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    to: "on"
+
+condition:
+  - condition: or
+    conditions:
+      - condition: sun
+        after: sunset
+      - condition: sun
+        before: sunrise
+
+action:
+  - service: light.turn_on
+    target: !input light_entity
+    data:
+      brightness_pct: !input brightness_pct
+      transition: 1
+  - delay:
+      seconds: !input timeout_seconds
+  - service: light.turn_off
+    target: !input light_entity
+    data:
+      transition: 3
