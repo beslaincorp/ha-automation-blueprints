@@ -58,7 +58,7 @@ Use code **LAUNCH50** for 50% off any product.
 
 Get weekly Home Assistant automation tips, YAML recipes, and security integration guides:
 
-[Subscribe to The Automated Home](https://theautomatedhome.beehiiv.com)
+[Subscribe to The Automated Home](https://theautomatedhome.beehiiv.com) | [Read the blog](https://automatedhomeguides.com)
 
 ## License
 
